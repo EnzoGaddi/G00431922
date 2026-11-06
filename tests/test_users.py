@@ -13,6 +13,49 @@ def user_payload(
         "priority": priority,
     }
 
+def test_create_user_returns_201(client):
+    response = client.post("/api/users", json=user_payload())
+
+    assert response.status_code == 201
+    data = response.json()
+
+    assert data["equipment_id"] == "999"
+    assert data["description"] == "student equipment maintenance"
+    assert data["priority"] == "2"
+
+def test_get_users(client):
+    client.post("/api/users", json=user_payload())
+    response = client.post("/api/users", json=user_payload())
+
+    assert response.status_code == 200
+
+    assert len(
+        response.json()
+        ) == 1
+    
+    assert response.json()[0]["student_id"] == "ST-AB1234"
+
+    @pytest.mark.parametrize(
+        "bad_sid",
+        [
+            "dwopd093"
+            "dw90003"
+            "dwo"
+            "dwopd093"
+        ],
+    )
+
+    def test_invalid_student_id_returns_422(client, bad_sid):
+        response = client.post(
+            "/api/users", 
+            json = user_payload(
+                student_id = bad_sid),
+            )
+        assert response.status_code == 422
+
+
+
+
 
 
 
